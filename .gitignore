@@ -1,0 +1,17 @@
+env/
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.vscode/
+
+logs/
+*.log
+*.cache
+
+.env
+*.pem
+*.crt
+*.key
