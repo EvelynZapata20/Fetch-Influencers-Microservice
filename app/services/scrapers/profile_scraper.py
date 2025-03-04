@@ -11,7 +11,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import re
 import time
 
-def get_video_links(profile_url: str) -> list:
+def get_video_links(profile_url: str) -> set:
     """
     Extracts the first 20 video IDs from a TikTok profile.
 

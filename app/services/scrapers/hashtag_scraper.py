@@ -10,7 +10,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 
-def get_usernames(tag_url):
+def get_usernames(tag_url: str) -> set:
     """
     Scrapes TikTok to extract unique usernames from a hashtag page.
     
