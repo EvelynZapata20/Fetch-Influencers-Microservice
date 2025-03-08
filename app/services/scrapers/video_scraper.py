@@ -5,7 +5,7 @@ This script automates the extraction of likes, comments, shares and saves
 from a TikTok video page using Selenium.
 """
 
-from app.utils.driver import init_driver
+from app.utils.webdriver import init_webdriver
 from app.utils.formatters import format_metric
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -29,7 +29,7 @@ def get_tiktok_video_data(video_url: str) -> dict:
             - shares: Number of shares of the video
             - saves: Number of saves of the video
     """
-    driver = init_driver()
+    driver = init_webdriver()
     wait = WebDriverWait(driver, 10)
     data = {}
 

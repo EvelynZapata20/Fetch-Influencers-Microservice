@@ -4,7 +4,7 @@ TikTok Profile Scraper
 This script scrapes TikTok to extract the first 20 video IDs from a user's profile.
 It uses Selenium to automate the browser and retrieve video links.
 """
-from app.utils.driver import init_driver
+from app.utils.webdriver import init_webdriver
 from app.utils.formatters import format_metric
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -29,7 +29,7 @@ def get_profile_info(profile_url: str) -> dict:
             - video_ids: List of first 20 video IDs
     """
     
-    driver = init_driver()
+    driver = init_webdriver()
     wait = WebDriverWait(driver, 10)
     profile_data = {}
 
