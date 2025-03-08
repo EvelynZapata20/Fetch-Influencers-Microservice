@@ -8,8 +8,11 @@ def format_metric(metric_text: str) -> int:
     Returns:
         float: The numerical value after converting K/M multipliers
     """
+    if not any(char.isdigit() for char in metric_text):  
+        return 0  
     if 'K' in metric_text:
         return float(metric_text.replace('K', '')) * 1000
     elif 'M' in metric_text:
         return float(metric_text.replace('M', '')) * 1000000
+    
     return float(metric_text)

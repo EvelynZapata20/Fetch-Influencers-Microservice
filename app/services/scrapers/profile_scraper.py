@@ -10,6 +10,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_profile_info(profile_url: str) -> dict:
     """
@@ -23,6 +26,7 @@ def get_profile_info(profile_url: str) -> dict:
             - name: User's display name
             - followers: Number of followers
             - avg_views: Average views across last 20 videos
+            - video_ids: List of first 20 video IDs
     """
     
     driver = init_driver()
@@ -48,11 +52,11 @@ def get_profile_info(profile_url: str) -> dict:
         profile_data['video_ids'] = video_ids
 
     except (TimeoutException, NoSuchElementException) as e:
-        print(f"Error retrieving profile info: {e}")
+        logger.error(f"Error retrieving profile info: {e}")
         return None
     
     except Exception as e:
-        print(f"An error occurred while scraping profile: {e}")
+        logger.error(f"An unexpected error occurred while scraping profile: {e}")
         return None
 
     finally:

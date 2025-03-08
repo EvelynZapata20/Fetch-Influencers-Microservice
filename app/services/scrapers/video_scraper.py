@@ -11,6 +11,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_tiktok_video_data(video_url: str) -> dict:
     """
@@ -46,10 +49,10 @@ def get_tiktok_video_data(video_url: str) -> dict:
         data["saves"] = format_metric(saves_element.text)
 
     except (TimeoutException, NoSuchElementException) as e:
-        print(f"Error retrieving video data: {e}")
+        logger.error(f"Error retrieving video data: {e}")
         return None
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        logger.error(f"An unexpected error occurred: {e}")
         return None
 
     finally:    
