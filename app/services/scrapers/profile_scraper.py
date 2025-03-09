@@ -24,6 +24,7 @@ def get_profile_info(profile_url: str) -> dict:
     Returns:
         dict: Dictionary containing profile metrics including:
             - name: User's display name
+            - image_url: User's profile image URL
             - followers: Number of followers
             - avg_views: Average views across last 20 videos
             - video_ids: List of first 20 video IDs
@@ -38,6 +39,9 @@ def get_profile_info(profile_url: str) -> dict:
         
         name_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'h2[data-e2e="user-subtitle"]')))
         profile_data['name'] = name_element.text
+
+        image_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'img.css-1zpj2q-ImgAvatar')))
+        profile_data['image_url'] = image_element.get_attribute('src')
         
         followers_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'strong[data-e2e="followers-count"]')))
         followers_text = followers_element.text

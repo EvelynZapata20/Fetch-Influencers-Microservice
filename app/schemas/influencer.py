@@ -7,6 +7,7 @@ class Influencer(BaseModel):
     Attributes:
         name (str): The influencer's full name.
         username (str): The TikTok username.
+        image_url (str): The URL of the influencer's profile image.
         followers (int): Total number of followers.
         location (str): The influencer's location, determined by the scraped tag.
         avg_likes (float): Average number of likes on the last 20 videos.
@@ -18,6 +19,7 @@ class Influencer(BaseModel):
     """
     name: str
     username: str
+    image_url: str
     followers: int
     location: str 
     avg_likes: float

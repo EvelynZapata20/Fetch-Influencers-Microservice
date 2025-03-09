@@ -68,6 +68,7 @@ def scrape_city_data(city: str) -> InfluencersList:
         influencer = Influencer(
             name=profile_data['name'],
             username=username,
+            image_url=profile_data['image_url'],
             followers=profile_data['followers'],
             location=city,
             avg_views=profile_data['avg_views'],
