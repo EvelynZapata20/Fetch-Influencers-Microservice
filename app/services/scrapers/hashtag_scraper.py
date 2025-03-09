@@ -4,11 +4,14 @@ TikTok Hashtag Scraper
 This script automates the extraction of unique usernames from videos 
 under a TikTok hashtag page using Selenium
 """
-from app.utils.driver import init_driver
+from app.utils.webdriver import init_webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_usernames(tag_url: str) -> set:
     """
@@ -21,7 +24,7 @@ def get_usernames(tag_url: str) -> set:
         set: A set of unique usernames found on the page.
     """
 
-    driver = init_driver()
+    driver = init_webdriver()
     wait = WebDriverWait(driver, 10)
     usernames = set()
 
@@ -40,10 +43,10 @@ def get_usernames(tag_url: str) -> set:
                 continue 
 
     except (TimeoutException, NoSuchElementException) as e:
-        print(f"Error retrieving hashtag data: {e}")
+        logger.error(f"Error retrieving hashtag data: {e}")
         return None
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        logger.error(f"An unexpected error occurred: {e}")
         return None
 
     finally:    

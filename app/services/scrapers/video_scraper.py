@@ -5,12 +5,15 @@ This script automates the extraction of likes, comments, shares and saves
 from a TikTok video page using Selenium.
 """
 
-from app.utils.driver import init_driver
+from app.utils.webdriver import init_webdriver
 from app.utils.formatters import format_metric
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_tiktok_video_data(video_url: str) -> dict:
     """
@@ -26,7 +29,7 @@ def get_tiktok_video_data(video_url: str) -> dict:
             - shares: Number of shares of the video
             - saves: Number of saves of the video
     """
-    driver = init_driver()
+    driver = init_webdriver()
     wait = WebDriverWait(driver, 10)
     data = {}
 
@@ -46,10 +49,10 @@ def get_tiktok_video_data(video_url: str) -> dict:
         data["saves"] = format_metric(saves_element.text)
 
     except (TimeoutException, NoSuchElementException) as e:
-        print(f"Error retrieving video data: {e}")
+        logger.error(f"Error retrieving video data: {e}")
         return None
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        logger.error(f"An unexpected error occurred: {e}")
         return None
 
     finally:    

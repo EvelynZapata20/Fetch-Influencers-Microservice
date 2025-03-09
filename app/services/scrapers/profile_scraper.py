@@ -4,12 +4,15 @@ TikTok Profile Scraper
 This script scrapes TikTok to extract the first 20 video IDs from a user's profile.
 It uses Selenium to automate the browser and retrieve video links.
 """
-from app.utils.driver import init_driver
+from app.utils.webdriver import init_webdriver
 from app.utils.formatters import format_metric
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_profile_info(profile_url: str) -> dict:
     """
@@ -21,11 +24,13 @@ def get_profile_info(profile_url: str) -> dict:
     Returns:
         dict: Dictionary containing profile metrics including:
             - name: User's display name
+            - image_url: User's profile image URL
             - followers: Number of followers
             - avg_views: Average views across last 20 videos
+            - video_ids: List of first 20 video IDs
     """
     
-    driver = init_driver()
+    driver = init_webdriver()
     wait = WebDriverWait(driver, 10)
     profile_data = {}
 
@@ -34,6 +39,9 @@ def get_profile_info(profile_url: str) -> dict:
         
         name_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'h2[data-e2e="user-subtitle"]')))
         profile_data['name'] = name_element.text
+
+        image_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'img.css-1zpj2q-ImgAvatar')))
+        profile_data['image_url'] = image_element.get_attribute('src')
         
         followers_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'strong[data-e2e="followers-count"]')))
         followers_text = followers_element.text
@@ -48,11 +56,11 @@ def get_profile_info(profile_url: str) -> dict:
         profile_data['video_ids'] = video_ids
 
     except (TimeoutException, NoSuchElementException) as e:
-        print(f"Error retrieving profile info: {e}")
+        logger.error(f"Error retrieving profile info: {e}")
         return None
     
     except Exception as e:
-        print(f"An error occurred while scraping profile: {e}")
+        logger.error(f"An unexpected error occurred while scraping profile: {e}")
         return None
 
     finally:
