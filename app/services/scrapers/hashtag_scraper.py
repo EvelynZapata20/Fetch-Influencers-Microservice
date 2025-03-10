@@ -6,7 +6,10 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import time
 import re
 import random
-def get_usernames(url_hashtag):
+import logging
+logger = logging.getLogger(__name__)
+
+def get_usernames(url_hashtag: str) -> set:
     driver = WebDriverManager.get_driver()
     usernames = set()
 
@@ -33,6 +36,7 @@ def get_usernames(url_hashtag):
                 continue
 
     except (TimeoutException, NoSuchElementException) as e:
-        print(f"Error in hashtag module: {e}")
+        logging.error(f"Error in hashtag module: {e}")
+        return None
 
     return usernames
