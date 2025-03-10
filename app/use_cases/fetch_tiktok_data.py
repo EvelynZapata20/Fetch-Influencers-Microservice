@@ -5,10 +5,10 @@ from app.schemas.influencer import Influencer, InfluencersList
 from app.utils.stats import calculate_averages
 import json
 import logging
-
+import random
 logger = logging.getLogger(__name__)
 
-def scrape_city_data(city: str) -> InfluencersList:
+def fetch_influencers_by_tag(city: str) -> InfluencersList:
     """
     Scrapes TikTok data for influencers in a given city
 
@@ -19,16 +19,24 @@ def scrape_city_data(city: str) -> InfluencersList:
         list[Influencer]: List of influencer data with engagement metrics
     """
 
-    tag_url = f"https://www.tiktok.com/tag/{city}"
+    tag_url = f"https://www.tiktok.com/search/video?q={city}"
     try:
-        usernames = get_usernames(tag_url)
+        temp_usernames = list(get_usernames(tag_url))
+        count_users = 0
+        usernames = []
+
+        while(count_users < 5):
+            usernames.append(temp_usernames.pop(random.randint(0, len(temp_usernames) - 1)))
+            count_users += 1
+        
+
     except Exception as e:
         logger.error(f"Error getting usernames: {e}")
         return InfluencersList(influencers_list=[])
     
     if not usernames:
         return InfluencersList(influencers_list=[])
-        
+    
     influencers = []
     
     for username in usernames:
@@ -44,7 +52,7 @@ def scrape_city_data(city: str) -> InfluencersList:
 
         metrics = {'likes': 0, 'comments': 0, 'shares': 0, 'saves': 0}
         total_videos = len(profile_data['video_ids'])
-        first_urls = []
+        featured_videos = []
 
         for video_id in profile_data['video_ids']:
             video_url = f"https://www.tiktok.com/@{username}/video/{video_id}"
@@ -60,25 +68,27 @@ def scrape_city_data(city: str) -> InfluencersList:
             for metric in metrics:
                 metrics[metric] += video_data[metric]
             
-            if len(first_urls) < 3:
-                first_urls.append(video_url)
+            if len(featured_videos) < 3:
+                featured_videos.append(video_url)
 
-        avg_metrics = calculate_averages(metrics, total_videos)
+        average_metrics = calculate_averages(metrics, total_videos)
         
         influencer = Influencer(
-            name=profile_data['name'],
             username=username,
-            image_url=profile_data['image_url'],
+            profile_name=profile_data['profile_name'],
+            profile_picture=profile_data['profile_picture'],
+            profile_url=profile_url,
+            average_views=profile_data['average_views'],
+            average_likes=average_metrics['average_likes'],
+            average_comments=average_metrics['average_comments'],
+            average_shares=average_metrics['average_shares'],
+            average_saves=average_metrics['average_saves'],
             followers=profile_data['followers'],
-            location=city,
-            avg_views=profile_data['avg_views'],
-            avg_likes=avg_metrics['avg_likes'],
-            avg_comments=avg_metrics['avg_comments'],
-            avg_shares=avg_metrics['avg_shares'],
-            avg_saves=avg_metrics['avg_saves'],
-            firsts_urls= first_urls
+            city=city,
+            featured_videos=featured_videos
         )
-        
-        influencers.append(influencer)
+
+        if influencer.is_significant():
+            influencers.append(influencer)
         
     return InfluencersList(influencers_list=influencers)
