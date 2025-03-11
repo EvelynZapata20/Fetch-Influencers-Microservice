@@ -15,3 +15,7 @@ logs/
 *.pem
 *.crt
 *.key
+
+venv/
+
+cookies_tiktok.pkl
