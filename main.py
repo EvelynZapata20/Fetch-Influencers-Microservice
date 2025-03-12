@@ -11,7 +11,7 @@ app.include_router(router)
 driver = WebDriverManager.get_driver()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(fetch_influencers_by_tag, "interval", hours=24, next_run_time=datetime.now())
+scheduler.add_job(fetch_influencers_by_tag, "interval", minutes=20, next_run_time=datetime.now())
 scheduler.start()
 
 @app.on_event("shutdown")
