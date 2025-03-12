@@ -1,23 +1,29 @@
-import undetected_chromedriver as uc
-import time
-import random
 import logging
-import pickle
-import traceback
 import os
+import pickle
+import random
+import time
+import traceback
+
+import undetected_chromedriver as uc
+from dotenv import load_dotenv
+from fake_useragent import UserAgent
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from fake_useragent import UserAgent
-from dotenv import load_dotenv
+from selenium.webdriver.support.ui import WebDriverWait
 
 # Configurar logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class WebDriverManager:
     """Singleton class to manage the WebDriver instance with stealth capabilities."""
+
     _driver = None
 
     @classmethod
@@ -37,7 +43,8 @@ class WebDriverManager:
 
             cls._driver = uc.Chrome(options=options, use_subprocess=True)
 
-            cls._driver.execute_script("""
+            cls._driver.execute_script(
+                """
                 Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
                 Object.defineProperty(navigator, 'languages', {get: () => ['es-CO', 'es']});
                 Object.defineProperty(navigator, 'platform', {get: () => 'Win32'});
@@ -48,20 +55,23 @@ class WebDriverManager:
                 Object.defineProperty(window, 'chrome', {runtime: {}});
                 Object.defineProperty(document, 'hidden', {get: () => false});
                 Object.defineProperty(document, 'visibilityState', {get: () => 'visible'})
-            """)
+            """
+            )
 
-            cls._driver.execute_script("""
+            cls._driver.execute_script(
+                """
                 Object.defineProperty(navigator, 'plugins', {
                     get: () => [1, 2, 3, 4, 5]
                 });
 
                 const originalQuery = window.navigator.permissions.query;
                 window.navigator.permissions.query = (parameters) => (
-                    parameters.name === 'notifications' ? 
-                    Promise.resolve({ state: 'granted' }) : 
+                    parameters.name === 'notifications' ?
+                    Promise.resolve({ state: 'granted' }) :
                     originalQuery(parameters)
                 );
-            """)
+            """
+            )
 
             cls.load_cookies()
 
@@ -84,7 +94,7 @@ class WebDriverManager:
             cls._driver.find_element(By.ID, "header-login-button")
             logger.info("Login not done.")
             return False
-        except:
+        except NoSuchElementException:
             logger.info("Login already done.")
             return True
 
@@ -99,8 +109,16 @@ class WebDriverManager:
         try:
             wait = WebDriverWait(cls._driver, 10)
 
-            username_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.tiktok-11to27l-InputContainer")))
-            password_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='password']")))
+            username_input = wait.until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "input.tiktok-11to27l-InputContainer")
+                )
+            )
+            password_input = wait.until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "input[type='password']")
+                )
+            )
 
             username_input.send_keys(username)
             time.sleep(random.uniform(1, 2))
@@ -113,7 +131,7 @@ class WebDriverManager:
             pickle.dump(cls._driver.get_cookies(), open("cookies_tiktok.pkl", "wb"))
             logger.info("Session and cookies saved successfully.")
 
-        except Exception as e:
+        except Exception:
             logger.error("Error trying to authenticate:")
             traceback.print_exc()
 

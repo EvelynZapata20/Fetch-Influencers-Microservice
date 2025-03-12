@@ -10,5 +10,5 @@ def calculate_averages(metrics: dict, total_videos: int) -> dict:
         dict: Dictionary with the average values of each metric.
     """
     total_videos = max(total_videos, 1)
-    
+
     return {f"average_{key}": value / total_videos for key, value in metrics.items()}

@@ -19,3 +19,5 @@ logs/
 venv/
 
 cookies_tiktok.pkl
+
+.ruff_cache/
