@@ -76,7 +76,7 @@ def fetch_influencers_by_tag() -> None:
                     metrics[metric] += video_data[metric]
                 
                 if len(featured_videos) < 3:
-                    featured_videos.append(video_url)
+                    featured_videos.append(video_id)
 
             average_metrics = calculate_averages(metrics, total_videos)
             
