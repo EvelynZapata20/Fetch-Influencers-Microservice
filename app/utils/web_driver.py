@@ -85,6 +85,19 @@ class WebDriverManager:
         return cls._driver
 
     @classmethod
+    def close_driver(cls):
+        """Close and cleanup the WebDriver instance."""
+        try:
+            if cls._driver is not None:
+                cls._driver.quit()
+                cls._driver = None
+                logger.info("WebDriver closed successfully")
+        except Exception as e:
+            logger.error(f"Error closing WebDriver: {str(e)}")
+            # Ensure driver is set to None even if quit fails
+            cls._driver = None
+
+    @classmethod
     def is_logged_in(cls):
         """Check if the user is already logged in."""
         cls._driver.get("https://www.tiktok.com")

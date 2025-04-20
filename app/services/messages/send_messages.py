@@ -8,6 +8,7 @@ It handles the message sending process with proper delays and error handling.
 import logging
 import random
 import time
+import re
 
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
@@ -18,6 +19,19 @@ from selenium.webdriver.common.keys import Keys
 from app.utils.web_driver import WebDriverManager
 
 logger = logging.getLogger(__name__)
+
+def clean_message(message: str) -> str:
+    """
+    Clean the message to ensure it only contains BMP Unicode characters.
+    
+    Args:
+        message (str): The original message.
+    
+    Returns:
+        str: The cleaned message with only BMP characters.
+    """
+    # Remove or replace non-BMP characters (characters outside U+0000 to U+FFFF)
+    return ''.join(c for c in message if ord(c) < 0x10000)
 
 def send_message(profile_url: str, message: str) -> bool:
     """
@@ -33,8 +47,14 @@ def send_message(profile_url: str, message: str) -> bool:
     driver = WebDriverManager.get_driver()
     wait_time = random.uniform(8, 12)
     wait = WebDriverWait(driver, wait_time)
+    success = False
 
     try:
+        # Clean the message before sending
+        cleaned_message = clean_message(message)
+        if cleaned_message != message:
+            logger.warning("Some characters were removed from the message due to Unicode limitations")
+        
         driver.get(profile_url)
         time.sleep(random.uniform(2, 5))
 
@@ -45,18 +65,35 @@ def send_message(profile_url: str, message: str) -> bool:
         )
         message_button.click()
         time.sleep(random.uniform(1, 3))
-        
-        editable = driver.find_element(
-            By.CSS_SELECTOR,
-            "div[data-e2e='message-input-area'] div[contenteditable='true']"
+
+        logger.info("Message button clicked.")
+                
+        editable = wait.until(
+            EC.presence_of_element_located((
+                By.CSS_SELECTOR,
+                "div[data-e2e='message-input-area'] div[contenteditable='true']"
+            ))
         )
 
+        logger.info("Editable element found.")
+        
         editable.click()
-        editable.send_keys(message + Keys.ENTER)
+        editable.send_keys(cleaned_message + Keys.ENTER)
 
-        print("Message sent successfully.")
-        return True
+        logger.info("Message sent successfully.")
+        success = True
 
     except Exception as e:
-        print(f"Error: {e}")
-        return False
+        logger.error(f"Error sending message: {str(e)}")
+        success = False
+    
+    finally:
+        try:
+            time.sleep(5)
+            # Always attempt to close the driver
+            WebDriverManager.close_driver()
+            logger.info("Driver closed successfully after message operation")
+        except Exception as e:
+            logger.error(f"Error while closing driver: {str(e)}")
+    
+    return success
