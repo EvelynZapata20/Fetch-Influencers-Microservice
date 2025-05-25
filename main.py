@@ -20,7 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-"""
+
 driver = WebDriverManager.get_driver()
 
 scheduler = BackgroundScheduler()
@@ -33,4 +33,4 @@ scheduler.start()
 @app.on_event("shutdown")
 def shutdown_scheduler():
     scheduler.shutdown()
-"""
+

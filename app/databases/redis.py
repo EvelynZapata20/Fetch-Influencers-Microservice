@@ -6,7 +6,7 @@ from app.schemas.influencer import Influencer
 
 logger = logging.getLogger(__name__)
 
-r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+r = redis.Redis(host="www.tiktrack.site", port=6379, db=0, decode_responses=True)
 
 
 def add_influencer(influencer: Influencer) -> None:
