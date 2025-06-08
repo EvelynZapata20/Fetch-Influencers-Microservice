@@ -1,16 +1,14 @@
-from datetime import datetime
-
-from apscheduler.schedulers.background import BackgroundScheduler
+import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.routes import router
-from app.use_cases.fetch_tiktok_data import fetch_influencers_by_tag
 from app.utils.web_driver import WebDriverManager
-
+from app.databases.redis import start_listener
 app = FastAPI(title="TikTok Scraper API", version="1.0")
 
 app.include_router(router)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,17 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 driver = WebDriverManager.get_driver()
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(
-    fetch_influencers_by_tag, "interval", minutes=20, next_run_time=datetime.now()
-)
-scheduler.start()
-
-
-@app.on_event("shutdown")
-def shutdown_scheduler():
-    scheduler.shutdown()
-
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(asyncio.to_thread(start_listener))
