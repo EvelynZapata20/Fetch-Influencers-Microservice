@@ -1,10 +1,3 @@
-"""
-TikTok Engagement Scraper
-
-This script automates the extraction of likes, comments, shares and saves
-from a TikTok video page using Selenium.
-"""
-
 import logging
 import random
 import time
