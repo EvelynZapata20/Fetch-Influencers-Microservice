@@ -14,6 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 def get_usernames(url_hashtag: str) -> set:
+    """
+    Scrapes TikTok to extract usernames from videos under a specific hashtag.
+    Args:
+        url_hashtag (str): The TikTok hashtag URL to scrape.
+    Returns:
+        set: A set of unique usernames found in the videos under the hashtag.
+    """
+    
     driver = WebDriverManager.get_driver()
     usernames = set()
 
